@@ -415,20 +415,23 @@ public class OrderServiceImpl implements OrderService {
             throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
         }
 
-//        //支付状态
-//        Integer payStatus = ordersDB.getPayStatus();
-//        if (payStatus == Orders.PAID) {
-//            //用户已支付，需要退款
+        //支付状态
+        Integer payStatus = ordersDB.getPayStatus();
+        if (payStatus == Orders.PAID) {
+            //用户已支付，需要退款
 //            String refund = weChatPayUtil.refund(
 //                    ordersDB.getNumber(),
 //                    ordersDB.getNumber(),
 //                    new BigDecimal(0.01),
 //                    new BigDecimal(0.01));
 //            log.info("申请退款：{}", refund);
-//        }
+            log.info("给订单{}退款", ordersDB.getNumber());
+        }
 
         // 拒单需要退款，根据订单id更新订单状态、拒单原因、取消时间
         Orders orders = new Orders();
+        orders.setPayStatus(Orders.REFUND);//修改订单支付状态为 ”已退款 “
+
         orders.setId(ordersDB.getId());
         orders.setStatus(Orders.CANCELLED);
         orders.setRejectionReason(ordersRejectionDTO.getRejectionReason());
@@ -443,23 +446,25 @@ public class OrderServiceImpl implements OrderService {
      * @param ordersCancelDTO
      */
     public void cancel(OrdersCancelDTO ordersCancelDTO) throws Exception {
-//        // 根据id查询订单
-//        Orders ordersDB = orderMapper.getById(ordersCancelDTO.getId());
-//
-//        //支付状态
-//        Integer payStatus = ordersDB.getPayStatus();
-//        if (payStatus == 1) {
-//            //用户已支付，需要退款
+        // 根据id查询订单
+        Orders ordersDB = orderMapper.getById(ordersCancelDTO.getId());
+
+        //支付状态
+        Integer payStatus = ordersDB.getPayStatus();
+        if (payStatus == 1) {
+            //用户已支付，需要退款
 //            String refund = weChatPayUtil.refund(
 //                    ordersDB.getNumber(),
 //                    ordersDB.getNumber(),
 //                    new BigDecimal(0.01),
 //                    new BigDecimal(0.01));
 //            log.info("申请退款：{}", refund);
-//        }
+            log.info("给订单{}退款", ordersDB.getNumber());
+        }
 
         // 管理端取消订单需要退款，根据订单id更新订单状态、取消原因、取消时间
         Orders orders = new Orders();
+        orders.setPayStatus(Orders.REFUND);//修改订单支付状态为 ”已退款 “
         orders.setId(ordersCancelDTO.getId());
         orders.setStatus(Orders.CANCELLED);
         orders.setCancelReason(ordersCancelDTO.getCancelReason());
